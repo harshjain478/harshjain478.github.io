@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TASK SETU — Find Trusted Local Workers</title>
+<!-- Import Premium Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Modern Premium Color Palette & Variables */
+:root {
+  --primary: #4F46E5;       /* Deep Indigo */
+  --primary-hover: #4338CA;
+  --secondary: #0F172A;     /* Rich Slate */
+  --accent: #10B981;        /* Emerald */
+  --accent-glow: rgba(16, 185, 129, 0.3);
+  --bg-light: #F8FAFC;      /* App Background */
+  --surface: #FFFFFF;       
+  --text-main: #475569;     
+  --text-heading: #1E293B;  
+  --border: #E2E8F0;
+  
+  /* Advanced Shadows */
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-hover: 0 20px 40px -8px rgba(79, 70, 229, 0.15);
+  
+  /* Modern Radii */
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+  --radius-md: 14px;
+  --radius-pill: 100px;
+  
+  --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { 
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif; 
+  color: var(--text-main); 
+  background: var(--bg-light); 
+  line-height: 1.6; 
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-up { animation: fadeUp 0.8s ease-out forwards; }
+
+/* Prototype Disclaimer */
+.prototype-banner {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white;
+  text-align: center; padding: 8px 5%; font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
+  z-index: 1000; position: relative;
+}
+
+/* Glassmorphism Nav */
+nav {
+  height: 80px; background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 6%; border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  position: sticky; top: 0; z-index: 50;
+}
+.logo { font-size: 26px; font-weight: 800; color: var(--secondary); letter-spacing: -0.5px; }
+.logo span { background: linear-gradient(135deg, var(--primary), #818CF8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+nav a { color: var(--text-main); text-decoration: none; margin-left: 32px; font-weight: 600; font-size: 15px; transition: var(--transition); }
+nav a:hover { color: var(--primary); }
+.btn { background: linear-gradient(135deg, var(--primary), #6366F1); color: white !important; padding: 12px 24px; border-radius: var(--radius-pill); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); margin-left: 20px; border: none; cursor: pointer; font-weight:700;}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4); }
+.login-link { color: var(--text-heading); font-weight: 700; margin-left: 32px; cursor: pointer; }
+.login-link:hover { color: var(--primary); }
+.lang-switcher { padding: 10px 16px; border: 1px solid var(--border); border-radius: var(--radius-pill); font-weight: 600; background: var(--surface); color: var(--text-heading); cursor: pointer; outline: none; transition: var(--transition); font-family: inherit; }
+
+/* Stylish Hero Section */
+.hero {
+  background: radial-gradient(circle at top right, #312E81 0%, #0F172A 100%);
+  color: white; padding: 120px 6% 140px;
+  display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 80px; align-items: center;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: -20%; left: -10%; width: 50%; height: 50%;
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.2) 0%, transparent 70%); filter: blur(60px);
+}
+.hero h1 { font-size: 64px; line-height: 1.1; margin-bottom: 24px; font-weight: 800; letter-spacing: -2px; }
+.hero h1 span { background: linear-gradient(to right, #818CF8, #C7D2FE); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero p { font-size: 20px; color: #94A3B8; max-width: 550px; margin-bottom: 48px; line-height: 1.7; font-weight: 500; }
+.hero .cta { display: flex; gap: 16px; flex-wrap: wrap; }
+.primary, .secondary { padding: 16px 32px; border-radius: var(--radius-pill); text-decoration: none; font-weight: 700; font-size: 16px; transition: var(--transition); text-align: center; }
+.primary { background: white; color: var(--secondary); box-shadow: 0 4px 14px rgba(255,255,255,0.15); }
+.primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255,255,255,0.25); }
+.secondary { border: 1px solid rgba(255,255,255,0.2); color: white; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); }
+.secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); transform: translateY(-3px); }
+
+/* Floating Search Card */
+.hero-card {
+  background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); color: var(--text-heading); 
+  padding: 40px; border-radius: var(--radius-xl); 
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255,255,255,0.5); transform: translateY(20px);
+}
+.hero-card h3 { font-size: 24px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
+.search { display: flex; gap: 12px; margin-top: 24px; background: var(--bg-light); padding: 8px; border-radius: var(--radius-lg); border: 1px solid var(--border); }
+.search input { flex: 1; padding: 16px; border: none; background: transparent; font-size: 16px; outline: none; font-family: inherit; font-weight: 500;}
+.search button { border: 0; background: var(--primary); color: white; border-radius: var(--radius-md); padding: 0 28px; font-weight: 700; cursor: pointer; transition: var(--transition); font-family: inherit;}
+
+/* Premium Subscription Banner */
+.guarantee-banner {
+  background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+  color: white; padding: 32px 6%; text-align: center; position: relative;
+  box-shadow: 0 10px 30px var(--accent-glow); margin-top: -30px; z-index: 10;
+}
+.guarantee-banner h2 { font-size: 26px; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 12px; letter-spacing: -0.5px; }
+.guarantee-banner p { font-size: 17px; font-weight: 500; max-width: 800px; margin: 0 auto; opacity: 0.95; line-height: 1.6; }
+
+/* Base Sections */
+section { padding: 100px 6%; }
+.section-head { text-align: center; margin-bottom: 60px; max-width: 700px; margin-inline: auto; }
+.section-head h2 { font-size: 40px; color: var(--text-heading); font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+.section-head p { color: var(--text-main); font-size: 18px; font-weight: 500; }
+
+/* Dynamic Grids & Cards */
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 40px 32px; transition: var(--transition); text-align: center; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
+.card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--primary); transform: scaleX(0); transition: var(--transition); transform-origin: left; }
+.card:hover { transform: translateY(-8px); box-shadow: var(--shadow-hover); border-color: transparent; }
+.card:hover::before { transform: scaleX(1); }
+.icon { font-size: 36px; margin-bottom: 24px; display: inline-flex; align-items: center; justify-content: center; width: 80px; height: 80px; background: #EEF2FF; border-radius: 24px; color: var(--primary); transition: var(--transition); }
+.card:hover .icon { background: var(--primary); color: white; transform: scale(1.1) rotate(-5deg); }
+.card h3 { color: var(--text-heading); margin-bottom: 12px; font-size: 20px; font-weight: 700; }
+.card p { font-size: 15px; color: var(--text-main); }
+.card button.outline-btn { width: 100%; margin-top: 24px; border: 2px solid #E0E7FF; background: transparent; color: var(--primary); padding: 14px; border-radius: var(--radius-md); font-weight: 700; font-size: 15px; cursor: pointer; transition: var(--transition); font-family: inherit; }
+.card button.outline-btn:hover { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 8px 16px rgba(79, 70, 229, 0.25); transform: translateY(-2px); }
+
+/* Mission / Dark Glass Section */
+.dark-section { background: var(--secondary); color: white; position: relative; }
+.dark-section .section-head h2 { color: white; }
+.dark-section .section-head p { color: #94A3B8; }
+.dark-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-lg); padding: 40px 32px; transition: var(--transition); text-align: center; }
+.dark-card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.2); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+.dark-card .icon { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+.dark-card h3 { color: #F8FAFC; margin-bottom: 12px; font-size: 20px; font-weight: 700; }
+.dark-card p { font-size: 15px; color: #CBD5E1; }
+
+/* Premium Worker Cards & Filters */
+.filters { display: flex; gap: 12px; justify-content: center; margin-bottom: 50px; flex-wrap: wrap; }
+.filter-btn { padding: 12px 24px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--text-main); font-weight: 600; font-size: 15px; cursor: pointer; transition: var(--transition); font-family: inherit; }
+.filter-btn:hover, .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+
+.workers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+.worker { background: var(--surface); border-radius: var(--radius-lg); padding: 32px 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: var(--transition); text-align: center; display: flex; flex-direction: column; align-items: center; }
+.worker:hover { box-shadow: var(--shadow-hover); transform: translateY(-8px); border-color: rgba(79, 70, 229, 0.3); }
+.avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #EEF2FF, #C7D2FE); display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: 20px; border: 4px solid white; box-shadow: 0 8px 16px rgba(0,0,0,0.06); }
+.worker h3 { color: var(--text-heading); font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.worker-loc { font-size: 14px; color: var(--text-main); margin-bottom: 16px; font-weight: 500; display: flex; gap: 6px; align-items: center;}
+.worker .tag { display: inline-flex; align-items: center; background: #ECFDF5; color: #059669; padding: 6px 14px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 700; margin-top: 12px; }
+.rating { color: #F59E0B; font-weight: 800; margin: 8px 0; font-size: 15px; background: #FEF3C7; padding: 4px 12px; border-radius: var(--radius-pill); display: inline-block; }
+.worker button { width: 100%; margin-top: 24px; border: 0; background: transparent; color: var(--primary); border: 2px solid #E0E7FF; padding: 14px; border-radius: var(--radius-md); font-weight: 700; font-size: 15px; cursor: pointer; transition: var(--transition); font-family: inherit; }
+.worker button:hover { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 8px 16px rgba(79, 70, 229, 0.25); transform: translateY(-2px); }
+
+/* Founder Message */
+.founder-section { background: linear-gradient(135deg, var(--secondary) 0%, #1E1B4B 100%); color: white; padding: 100px 6%; text-align: center; position: relative; overflow: hidden; }
+.founder-content { max-width: 900px; margin: 0 auto; position: relative; z-index: 2; }
+.quote-icon { font-size: 80px; color: rgba(255, 255, 255, 0.15); font-family: serif; line-height: 0.5; margin-bottom: 20px; }
+.founder-quote { font-size: 24px; line-height: 1.8; font-weight: 500; font-style: italic; margin-bottom: 40px; color: #F8FAFC; }
+.founder-name { font-size: 22px; font-weight: 800; color: white; margin-bottom: 8px; letter-spacing: -0.5px; }
+.founder-title { font-size: 15px; color: #818CF8; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }
+
+/* Modals */
+.modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); align-items: center; justify-content: center; z-index: 100; opacity: 0; animation: fadeIn 0.3s forwards; }
+@keyframes fadeIn { to { opacity: 1; } }
+.modal-box { background: var(--surface); width: min(420px, 90%); padding: 40px; border-radius: var(--radius-xl); box-shadow: 0 25px 50px rgba(0,0,0,0.25); animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; transform: scale(0.95); opacity: 0; }
+@keyframes modalIn { to { transform: scale(1); opacity: 1; } }
+.modal-box input, .modal-box select { width: 100%; padding: 16px; margin: 8px 0 20px; border: 2px solid var(--border); border-radius: var(--radius-md); font-size: 15px; outline: none; transition: var(--transition); background: var(--bg-light); font-family: inherit; font-weight: 500;}
+.modal-box button { width: 100%; padding: 18px; margin-top: 8px; border: 0; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--primary), #6366F1); color: white; font-weight: 700; font-size: 16px; cursor: pointer; font-family: inherit; }
+.close { background: #F1F5F9; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main); font-size: 18px; transition: var(--transition); }
+.close:hover { background: #E2E8F0; transform: rotate(90deg); }
+
+/* Footer & WhatsApp */
+footer { background: #0B1120; color: #94A3B8; padding: 80px 6% 40px; display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 60px; border-top: 1px solid rgba(255,255,255,0.05); }
+footer h4 { color: white; font-size: 18px; margin-bottom: 24px; font-weight: 700; }
+footer strong { color: white; font-size: 28px; letter-spacing: -1px; display: block; margin-bottom: 16px; font-weight: 800;}
+footer a { color: #818CF8; text-decoration: none; transition: var(--transition); font-weight: 500; }
+.wa-float { position: fixed; width: 64px; height: 64px; bottom: 40px; right: 40px; background-color: #25D366; color: #FFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0px 8px 24px rgba(37, 211, 102, 0.4); z-index: 100; transition: var(--transition); animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5); } 70% { box-shadow: 0 0 0 20px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
+.wa-float:hover { transform: scale(1.1) rotate(-10deg); animation: none; box-shadow: 0px 12px 28px rgba(37, 211, 102, 0.6); }
+
+/* Responsive Adjustments */
+@media(max-width:1200px){ .workers, .grid { grid-template-columns: repeat(3, 1fr); } }
+@media(max-width:992px){ 
+  .hero { grid-template-columns: 1fr; text-align: center; padding: 100px 6%; gap: 60px; } 
+  .hero p { margin: 0 auto 40px; } .hero .cta { justify-content: center; } 
+  footer { grid-template-columns: 1fr; gap: 40px; text-align: center;} 
+  .grid, .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media(max-width:768px){ 
+  nav { padding: 0 6%; } nav a:not(.login-link) { display: none; } 
+  .workers { grid-template-columns: repeat(2, 1fr); } .hero h1 { font-size: 48px; } 
+  .wa-float { width: 56px; height: 56px; bottom: 24px; right: 24px; } 
+}
+@media(max-width:550px){ .grid, .grid-3, .workers { grid-template-columns: 1fr; } .hero h1 { font-size: 40px; } }
+</style>
+</head>
+<body>
+
+<div class="prototype-banner" data-hi="अस्वीकरण: यह वेबसाइट केवल एक प्रोटोटाइप है। सभी सुविधाएँ केवल प्रदर्शन के उद्देश्य से हैं।">
+  Disclaimer: This website is a prototype. All features and data are for demonstration purposes only.
+</div>
+
+<nav>
+  <div class="logo">TASK <span>SETU</span></div>
+  <div style="display:flex;align-items:center;">
+    <select id="navLanguageSelect" class="lang-switcher" onchange="changeLanguage(this.value)" aria-label="Language">
+      <option value="en">English</option>
+      <option value="hi">हिंदी</option>
+    </select>
+    <a href="#quick-service" data-hi="त्वरित सेवा">Quick Service</a>
+    <a href="#business-services" data-hi="व्यवसाय के लिए">For Business</a>
+    <a href="#find-workers" data-hi="कामगार खोजें">Find Workers</a>
+    <span class="login-link" onclick="openModal('loginModal')" data-hi="लॉगिन">Login</span>
+    <button class="btn" onclick="openModal('workerModal')" data-hi="कामगार बनें">Join as Worker</button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="animate-up">
+    <h1 id="hero-title" data-hi="अपने काम के लिए सही <span>कामगार</span> खोजें।">Find the right <span>worker</span> for your job.</h1>
+    <p id="hero-desc" data-hi="टास्क सेतु ग्राहकों को घर, व्यवसाय और निर्माण सेवाओं के लिए भरोसेमंद स्थानीय कामगारों से जोड़ता है। असंगठित क्षेत्र को विश्वसनीय अवसरों के माध्यम से ऊपर उठाना।">TASK SETU connects customers with trusted local workers for home, business, and construction services. Uplifting the unorganized sector through reliable opportunities.</p>
+    <div class="cta">
+      <a class="primary" href="#find-workers" data-hi="कामगार खोजें">Browse Workers</a>
+      <a class="secondary" href="#" onclick="openModal('workerModal');return false;" data-hi="कामगार पंजीकरण">Register as Worker</a>
+    </div>
+  </div>
+  <div class="hero-card animate-up" style="animation-delay: 0.2s;">
+    <h3 data-hi="आपको कौन सी सेवा चाहिए?">What service do you need?</h3>
+    <p style="color:var(--text-main);font-size:15px;margin-bottom:8px;font-weight:500;" data-hi="एक भरोसेमंद स्थानीय कामगार खोजें।">Search for a trusted local worker.</p>
+    <div class="search">
+      <input id="serviceSearch" placeholder="e.g. electrician" data-hi-placeholder="उदा. इलेक्ट्रीशियन">
+      <button onclick="searchWorkers()" data-hi="खोजें">Search</button>
+    </div>
+    <p id="searchMsg" style="color:var(--primary);font-weight:700;margin-top:20px;font-size:14px;"></p>
+  </div>
+</header>
+
+<div class="guarantee-banner animate-up" style="animation-delay: 0.4s;">
+  <h2 data-hi="🛡️ सदस्यता गारंटी: आपका काम कभी नहीं रुकेगा!">🛡️ Subscription Guarantee: Your Work Will Never Stop!</h2>
+  <p data-hi="यदि आपके पास हमारी सदस्यता (Subscription) है, तो हम यह सुनिश्चित करते हैं कि कामगार हमेशा आएगा। भले ही कामगार बदल जाए, लेकिन आपका काम 100% पूरा होगा।">With an active subscription, we guarantee a worker will always arrive. Even if a specific worker changes, a replacement is instantly provided to ensure your work is completed without delay.</p>
+</div>
+
+<!-- ================= ADDED: QUICK SERVICE PROMISE ================= -->
+<section id="quick-service" style="background: white;">
+ <div class="section-head">
+  <h2 data-hi="त्वरित सेवा का वादा">Quick Service Promise</h2>
+  <p data-hi="घंटों इंतजार किए बिना तुरंत मदद पाएं।">Get help without waiting for hours.</p>
+ </div>
+ <div class="grid">
+  <div class="card" style="border-color: var(--primary); box-shadow: var(--shadow-md);">
+   <div class="icon">⏱️</div>
+   <h3 data-hi="30-मिनट में आगमन">30-Minute Arrival</h3>
+   <p data-hi="योग्य बुकिंग के लिए, सत्यापित कामगार 30 मिनट के भीतर पहुंचता है।">For eligible nearby bookings, a verified worker arrives within <strong>30 minutes</strong>.</p>
+  </div>
+  <div class="card">
+   <div class="icon">📍</div>
+   <h3 data-hi="नज़दीकी कामगार">Nearby Workers</h3>
+   <p data-hi="प्लेटफॉर्म आपके नज़दीकी कामगारों को प्राथमिकता देता है।">The platform prioritizes workers who are closest to your location.</p>
+  </div>
+  <div class="card">
+   <div class="icon">🔔</div>
+   <h3 data-hi="लाइव स्थिति">Live Status</h3>
+   <p data-hi="बुकिंग की स्थिति देखें जैसे अनुरोध, रास्ते में और आगमन।">Customers can see live booking status such as Requested, On the Way, and Arrived.</p>
+  </div>
+  <div class="card">
+   <div class="icon">🛡️</div>
+   <h3 data-hi="सत्यापित सेवा">Verified Service</h3>
+   <p data-hi="केवल सत्यापित कामगारों को त्वरित-सेवा बैज प्राप्त होता है।">Only verified background-checked workers receive the quick-service badge.</p>
+  </div>
+ </div>
+</section>
+
+<!-- ================= MISSION ================= -->
+<section id="mission" class="dark-section">
+  <div class="section-head">
+    <h2 data-hi="असंगठित क्षेत्र को सशक्त बनाना">Empowering the Unorganized Sector</h2>
+    <p data-hi="हम दिहाड़ी मज़दूरी को एक सम्मानित पेशे में बदल रहे हैं।">We are transforming daily wage labor into a respected profession.</p>
+  </div>
+  <div class="grid-3">
+    <div class="dark-card"><div class="icon">💵</div><h3 data-hi="100% कामगार की कमाई">100% Worker Earnings</h3><p data-hi="शून्य कमीशन; हमारे कामगार अपनी कमाई का एक-एक रुपया अपने पास रखते हैं।">Zero commissions taken; our workers keep every single rupee they earn.</p></div>
+    <div class="dark-card"><div class="icon">🌱</div><h3 data-hi="ज़मीनी स्तर पर ध्यान">Grassroots Focus</h3><p data-hi="हम केवल शहरी फ्रीलांसरों को ही नहीं, बल्कि दिहाड़ी मज़दूरों को सीधे ऊपर उठाते हैं।">We directly uplift daily wage laborers, not just established urban freelancers.</p></div>
+    <div class="dark-card"><div class="icon">🛡️</div><h3 data-hi="मुफ्त कामगार बीमा">Free Worker Insurance</h3><p data-hi="कामगारों को बिना किसी लागत के पूरी सुरक्षा और चिकित्सा कवरेज प्रदान की जाती है।">Complete safety and medical coverage provided at absolutely no cost to the worker.</p></div>
+    <div class="dark-card"><div class="icon">👑</div><h3 data-hi="सदस्यता-वित्तपोषित">Subscription-Funded</h3><p data-hi="हम कभी भी कामगारों से पैसे नहीं लेते; हमारा प्लेटफ़ॉर्म ग्राहकों द्वारा वित्तपोषित है।">We never charge workers for job leads; our platform is funded entirely by customers.</p></div>
+    <div class="dark-card"><div class="icon">💳</div><h3 data-hi="केंद्रीकृत भुगतान">Centralized Payments</h3><p data-hi="हम सभी बिलिंग को संभालते हैं, यह सुनिश्चित करते हुए कि समय पर भुगतान मिले।">We handle all billing, ensuring workers are paid on time without having to haggle.</p></div>
+    <div class="dark-card"><div class="icon">📅</div><h3 data-hi="गारंटीकृत स्थिरता">Guaranteed Stability</h3><p data-hi="हम रोज़ाना काम खोजने की मजबूरी को निरंतर काम के अवसर से बदलते हैं।">We replace the daily hunt for gigs with a reliable, steady pipeline of work.</p></div>
+  </div>
+</section>
+
+<!-- ================= ADDED: BUSINESS SERVICES ================= -->
+<section id="business-services" style="background: white;">
+ <div class="section-head">
+  <h2 data-hi="व्यवसायों के लिए सेवाएँ">More Services for Businesses</h2>
+  <p data-hi="दुकान और कार्यालय की रोजमर्रा की जरूरतों के लिए नियमित कामगार और त्वरित मदद।">Get regular workers and quick help for everyday business needs.</p>
+ </div>
+ <div class="grid">
+  <div class="card"><div class="icon">🧹</div><h3 data-hi="सफाई और सुरक्षा">Cleaning & Safety</h3><p data-hi="दुकानों और कार्यालयों के लिए सफाई और बुनियादी रखरखाव।">Cleaning, basic maintenance and workplace safety support.</p></div>
+  <div class="card"><div class="icon">👷</div><h3 data-hi="दुकान का कामगार">Daily Shop Worker</h3><p data-hi="लोडिंग और स्टॉक व्यवस्थित करने जैसे कामों के लिए वर्कर।">Book a worker for daily shop tasks like loading and arranging stock.</p></div>
+  <div class="card"><div class="icon">🪚</div><h3 data-hi="लकड़ी की मरम्मत">Wood Repair</h3><p data-hi="टूटे हुए लकड़ी के फर्नीचर, दरवाजे और शेल्फ की मरम्मत।">Repair broken wooden items, doors, tables, shelves and furniture.</p></div>
+  <div class="card"><div class="icon">🔨</div><h3 data-hi="सामान्य मरम्मत">General Repair</h3><p data-hi="आपके कार्यस्थल पर सामान्य मरम्मत के काम के लिए मदद।">Get help with common repair and maintenance work at your shop.</p></div>
+  <div class="card"><div class="icon">📦</div><h3 data-hi="लोडिंग और अनलोडिंग">Load & Unload</h3><p data-hi="माल ले जाने और वाहन लोड करने के लिए कामगार।">Workers for moving goods, loading vehicles and arranging stock.</p></div>
+  <div class="card"><div class="icon">🏪</div><h3 data-hi="दुकान सहायता">Shop Support</h3><p data-hi="रोजमर्रा की दुकान सहायता के लिए नियमित कामगार।">Regular workers for cleaning, stock arrangement and day-to-day help.</p></div>
+  <div class="card"><div class="icon">🧰</div><h3 data-hi="आपातकालीन मरम्मत">Emergency Repair</h3><p data-hi="तत्काल जरूरतों के लिए पास के कामगारों का अनुरोध करें।">Request nearby verified workers for urgent repair needs.</p></div>
+  <div class="card"><div class="icon">📅</div><h3 data-hi="नियमित कामगार">Regular Worker</h3><p data-hi="दैनिक, साप्ताहिक या मासिक व्यावसायिक आवश्यकताओं के लिए।">Schedule a worker for daily, weekly or monthly business requirements.</p></div>
+ </div>
+</section>
+
+<!-- ================= ADDED: MONTHLY BULK WORKERS ================= -->
+<section id="bulk-workers">
+ <div class="section-head">
+  <h2 data-hi="मासिक थोक कामगार और पैकेज">Monthly Bulk Workers & Packages</h2>
+  <p data-hi="अपने व्यवसाय के लिए हर महीने कई कामगारों की आवश्यकता है? एक योजना चुनें।">Need many workers for your business every month? Choose a bulk worker plan.</p>
+ </div>
+ <div class="grid">
+  <div class="card">
+   <div class="icon">👷‍♂️</div>
+   <h3 data-hi="स्टार्टर (5 कामगार)">Starter (5 Workers)</h3>
+   <p data-hi="छोटी दुकानों और कार्यालयों के लिए जिन्हें कभी-कभार मदद की आवश्यकता होती है।">For small shops and offices that need occasional help.</p>
+   <p style="font-weight:800;color:var(--text-heading);margin-top:10px;font-size:20px;">(XXXX)</p>
+   <button class="outline-btn" onclick="submitMessage('Starter Plan Selected')" data-hi="पैकेज चुनें">Request Plan</button>
+  </div>
+  <div class="card" style="border:2px solid var(--primary); box-shadow:var(--shadow-md);">
+   <div class="icon" style="background:var(--primary);color:white;">👷‍♂️👷‍♂️</div>
+   <h3 data-hi="बिज़नेस (10 कामगार)">Business (10 Workers)</h3>
+   <p data-hi="बढ़ते व्यवसायों और नियमित काम के लिए।">For growing businesses and regular monthly work.</p>
+   <p style="font-weight:800;color:var(--text-heading);margin-top:10px;font-size:20px;">(XXXX)</p>
+   <button class="btn" style="width:100%; margin-left:0; margin-top:24px;" onclick="submitMessage('Business Plan Selected')" data-hi="पैकेज चुनें">Request Plan</button>
+  </div>
+  <div class="card">
+   <div class="icon">🏗️</div>
+   <h3 data-hi="प्रोजेक्ट (25 कामगार)">Project (25 Workers)</h3>
+   <p data-hi="बड़ी दुकानों, ठेकेदारों और परियोजनाओं के लिए।">For large shops, contractors and major construction projects.</p>
+   <p style="font-weight:800;color:var(--text-heading);margin-top:10px;font-size:20px;">(XXXX)</p>
+   <button class="outline-btn" onclick="submitMessage('Project Plan Selected')" data-hi="पैकेज चुनें">Request Plan</button>
+  </div>
+  <div class="card">
+   <div class="icon">🏢</div>
+   <h3 data-hi="एंटरप्राइज़ (कस्टम)">Enterprise (Custom)</h3>
+   <p data-hi="बड़ी कंपनियों के लिए कस्टम कामगार टीम और समर्थन।">Custom worker teams and full support for larger companies.</p>
+   <p style="font-weight:800;color:var(--text-heading);margin-top:10px;font-size:20px;">(XXXX)</p>
+   <button class="outline-btn" onclick="submitMessage('Enterprise Plan Selected')" data-hi="संपर्क करें">Contact Us</button>
+  </div>
+ </div>
+</section>
+
+<!-- ================= WORKERS DIRECTORY ================= -->
+<section id="find-workers" style="background: white;">
+ <div class="section-head">
+    <h2 data-hi="कामगार खोजें">Browse & Find Workers</h2>
+    <p data-hi="सत्यापित पेशेवरों, दिहाड़ी मजदूरों और दुकान सहायकों की हमारी सूची देखें।">Explore our directory of verified professionals, daily laborers, and shop helpers.</p>
+ </div>
+ 
+ <div class="filters">
+   <button class="filter-btn active" onclick="filterWorkers('all')" data-hi="सभी">All Workers</button>
+   <button class="filter-btn" onclick="filterWorkers('electrician')" data-hi="इलेक्ट्रीशियन">Electricians</button>
+   <button class="filter-btn" onclick="filterWorkers('plumber')" data-hi="प्लंबर">Plumbers</button>
+   <button class="filter-btn" onclick="filterWorkers('mason')" data-hi="मिस्त्री / बढ़ई">Masons & Carpenters</button>
+   <button class="filter-btn" onclick="filterWorkers('labour')" data-hi="लोडर / मज़दूर">Loaders & Labour</button>
+ </div>
+
+ <div class="workers" id="workerGrid">
+  <div class="worker" data-category="electrician"><div class="avatar">👨‍🔧</div><h3>Rahul Kumar</h3><p data-hi="इलेक्ट्रीशियन · 6 साल का अनुभव">Electrician · 6 yrs exp</p><div class="worker-loc">📍 <span data-hi="भोपाल">Bhopal</span></div><div class="rating">★★★★★ 4.9</div><span class="tag" data-hi="✓ सत्यापित">✓ Verified</span><button onclick="book('Rahul Kumar')" data-hi="बुक करें">Book Worker</button></div>
+  <div class="worker" data-category="plumber"><div class="avatar">👷</div><h3>Arjun Singh</h3><p data-hi="प्लंबर · 5 साल का अनुभव">Plumber · 5 yrs exp</p><div class="worker-loc">📍 <span data-hi="भोपाल">Bhopal</span></div><div class="rating">★★★★★ 4.8</div><span class="tag" data-hi="✓ सत्यापित">✓ Verified</span><button onclick="book('Arjun Singh')" data-hi="बुक करें">Book Worker</button></div>
+  <div class="worker" data-category="mason"><div class="avatar">🧑‍🔧</div><h3>Imran Khan</h3><p data-hi="राजमिस्त्री · 8 साल का अनुभव">Mason · 8 yrs exp</p><div class="worker-loc">📍 <span data-hi="सागर">Sagar</span></div><div class="rating">★★★★☆ 4.7</div><span class="tag" data-hi="✓ सत्यापित">✓ Verified</span><button onclick="book('Imran Khan')" data-hi="बुक करें">Book Worker</button></div>
+  <div class="worker" data-category="labour"><div class="avatar">📦</div><h3>Suresh Patel</h3><p data-hi="लोडर / दुकान सहायक · 3 साल">Loader / Shop Helper · 3 yrs</p><div class="worker-loc">📍 <span data-hi="सागर">Sagar</span></div><div class="rating">★★★★★ 4.9</div><span class="tag" data-hi="✓ उपलब्ध">✓ Available Now</span><button onclick="book('Suresh Patel')" data-hi="बुक करें">Book Worker</button></div>
+ </div>
+</section>
+
+<!-- ================= ADDED: COMPANY REVENUE MODEL ================= -->
+<section id="company-money">
+ <div class="section-head">
+  <h2 data-hi="कंपनी राजस्व मॉडल">Company Revenue Model</h2>
+  <p data-hi="हम कामगारों से शुल्क नहीं लेते, यहाँ बताया गया है कि TASK SETU कैसे कमाता है।">Because we never charge workers, here is how TASK SETU sustains itself.</p>
+ </div>
+ <div class="grid">
+  <div class="card"><div class="icon">💳</div><h3 data-hi="बुकिंग कमीशन">Platform Fees</h3><p data-hi="लेनदेन के ग्राहक पक्ष पर लागू छोटी सुविधा शुल्क।">Small convenience fees applied strictly to the customer side of the transaction.</p></div>
+  <div class="card"><div class="icon">👑</div><h3 data-hi="ग्राहक सदस्यता">Customer Membership</h3><p data-hi="प्रीमियम बुकिंग सुविधाओं तक पहुंचने के लिए ग्राहकों द्वारा ली गई सदस्यता।">Monthly membership plans provide recurring revenue and premium features for clients.</p></div>
+  <div class="card"><div class="icon">📢</div><h3 data-hi="फीचर्ड लिस्टिंग">Featured Listings</h3><p data-hi="व्यवसाय हमारे प्लेटफ़ॉर्म पर अतिरिक्त दृश्यता के लिए भुगतान कर सकते हैं।">Businesses and agencies can pay for extra visibility and advertising on our platform.</p></div>
+  <div class="card"><div class="icon">🏢</div><h3 data-hi="बिज़नेस योजनाएँ">Business Plans</h3><p data-hi="ठेकेदार और कंपनियां थोक कामगार योजनाओं के लिए भुगतान करते हैं।">Contractors and companies pay for specialized monthly bulk worker packages.</p></div>
+ </div>
+</section>
+
+<!-- ================= FOUNDER MESSAGE ================= -->
+<section class="founder-section">
+  <div class="founder-content">
+    <div class="quote-icon">"</div>
+    <p class="founder-quote" data-hi="&quot;मज़दूर चौक&quot; पर, मैंने कुशल लोगों को केवल नौकरी के लिए नहीं, बल्कि सम्मान और स्थिरता के लिए इंतज़ार करते देखा। यह प्लेटफ़ॉर्म उनकी वास्तविकता को स्थायी रूप से बदलने के लिए बनाया गया था। हम अपने कामगारों को गारंटीकृत नियमित काम, मुफ्त संपूर्ण बीमा और वह सम्मान प्रदान करते हैं जिसके वे हकदार हैं। शून्य कमीशन लेने और सभी भुगतानों को केंद्रीय रूप से प्रबंधित करने से, हम यह सुनिश्चित करते हैं कि वे अपनी कमाई का 100% घर ले जाएं। जब आप हमारे माध्यम से काम पर रखते हैं, तो आप केवल विशेषज्ञ सेवा प्राप्त नहीं कर रहे हैं—आप सीधे परिवारों का उत्थान कर रहे हैं और एक निष्पक्ष, अधिक सम्मानजनक समाज बनाने में मदद कर रहे हैं।">
+      At the 'Labour Chowk,' I saw skilled individuals waiting for dignity and stability, not just jobs. This platform was built to permanently change their reality. We provide our workers with guaranteed regular work, free comprehensive insurance, and the respect they deserve. By charging zero commission and managing all payments centrally, we ensure they take home 100% of what they earn. When you hire through us, you aren't just getting expert service—you are directly uplifting families and helping build a fairer, more dignified society.
+    </p>
+    <div class="founder-name" data-hi="— हर्ष जैन और कृष्णा राजपूत">— Harsh Jain & Krishna Rajput</div>
+    <div class="founder-title" data-hi="संस्थापक">Founders</div>
+  </div>
+</section>
+
+<!-- Floating WhatsApp Icon -->
+<a href="https://wa.me/91626701067" class="wa-float" target="_blank" aria-label="Chat on WhatsApp">
+  <svg class="wa-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zM223.9 413.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 334.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg>
+</a>
+
+<!-- Modals -->
+<div id="loginModal" class="modal">
+  <div class="modal-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+        <h2 style="color:var(--text-heading); font-size:24px; font-weight:800;" data-hi="यूज़र लॉग इन">User Login</h2>
+        <div class="close" onclick="closeModal('loginModal')">✖</div>
+    </div>
+    <input type="text" id="loginId" placeholder="User ID / Phone Number" data-hi-placeholder="यूज़र आईडी / फ़ोन नंबर">
+    <input type="password" id="loginPass" placeholder="Password / OTP" data-hi-placeholder="पासवर्ड / ओटीपी">
+    <button onclick="submitMessage('Logged In')" data-hi="अकाउंट में लॉग इन करें">Login to Account</button>
+  </div>
+</div>
+
+<div id="workerModal" class="modal">
+  <div class="modal-box" style="width: min(480px, 90%);">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 24px;">
+        <div>
+          <h2 style="color:var(--text-heading); font-size:24px; font-weight:800; margin-bottom:4px;">Register as Worker</h2>
+          <span style="font-size: 15px; color: var(--text-main); font-weight:600;">कामगार के रूप में जुड़ें</span>
+        </div>
+        <div class="close" onclick="closeModal('workerModal')">✖</div>
+    </div>
+    <div style="background: rgba(16, 185, 129, 0.1); border:1px solid rgba(16, 185, 129, 0.2); padding:14px; border-radius:12px; margin-bottom: 24px;">
+        <p style="font-size: 14px; color: #059669; font-weight: 700; text-align:center; display:flex; gap:8px; justify-content:center;">
+          <span>✓ 100% Free (मुफ्त)</span><span style="color: rgba(5, 150, 105, 0.3);">•</span><span>✓ No Commission (कोई कमीशन नहीं)</span>
+        </p>
+    </div>
+    <input type="text" id="regName" placeholder="Full Name (पूरा नाम)">
+    <input type="tel" id="regPhone" placeholder="Phone Number (फ़ोन नंबर)">
+    <select id="regService">
+      <option value="" disabled selected>Select Service (काम चुनें)</option>
+      <option value="electrician">Electrician (इलेक्ट्रीशियन)</option>
+      <option value="plumber">Plumber (प्लंबर)</option>
+      <option value="mason">Mason (राजमिस्त्री)</option>
+      <option value="labour">Loader / Daily Labour (लोडर / मज़दूर)</option>
+    </select>
+    <button onclick="submitMessage('Registration Submitted')" data-hi="रजिस्टर करें">Submit Registration</button>
+  </div>
+</div>
+
+<footer>
+  <div>
+    <strong>TASK SETU</strong>
+    <p data-hi="आपको भरोसेमंद स्थानीय कामगारों से जोड़ना।">Connecting you with trusted local workers.</p>
+  </div>
+  <div>
+    <h4 data-hi="संपर्क करें">Contact Us</h4>
+    <p>📞 <a href="tel:+91626701067">+91 626701067</a></p>
+    <p>✉️ <a href="mailto:info@tasksetu.com">info@tasksetu.com</a></p>
+    <p>💬 <a href="https://wa.me/91626701067" target="_blank" data-hi="व्हाट्सएप पर चैट करें">Chat on WhatsApp</a></p>
+  </div>
+  <div style="display: flex; flex-direction: column; justify-content: flex-end;">
+    <p style="color: #64748B; font-weight: 500;">&copy; 2026 TASK SETU.<br>All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  // TRANSLATION ENGINE
+  function changeLanguage(lang) { 
+    document.getElementById('navLanguageSelect').value = lang;
+    document.querySelectorAll('[data-hi]').forEach(el => {
+      if (lang === 'hi') {
+        if (!el.dataset.en) { el.dataset.en = el.innerHTML; }
+        el.innerHTML = el.dataset.hi;
+      } else {
+        if (el.dataset.en) { el.innerHTML = el.dataset.en; }
+      }
+    });
+    document.querySelectorAll('[data-hi-placeholder]').forEach(el => {
+      if (lang === 'hi') {
+        if (!el.dataset.enPlaceholder) { el.dataset.enPlaceholder = el.placeholder; }
+        el.placeholder = el.dataset.hiPlaceholder;
+      } else {
+        if (el.dataset.enPlaceholder) { el.placeholder = el.dataset.enPlaceholder; }
+      }
+    });
+  }
+
+  // WORKER FILTERING LOGIC
+  function filterWorkers(category) {
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    const workers = document.querySelectorAll('.worker');
+    workers.forEach(worker => {
+      if(category === 'all' || worker.getAttribute('data-category') === category) {
+        worker.style.display = 'flex';
+      } else {
+        worker.style.display = 'none';
+      }
+    });
+  }
+
+  // UI Interactions
+  function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+  
+  function searchWorkers() { 
+    const query = document.getElementById('serviceSearch').value;
+    const msgBox = document.getElementById('searchMsg');
+    const isHindi = document.getElementById('navLanguageSelect').value === 'hi';
+    if(query.trim() === "") {
+        msgBox.style.color = "#EF4444"; 
+        msgBox.innerText = isHindi ? "कृपया खोजने के लिए सेवा का नाम दर्ज करें।" : "Please enter a service to search.";
+    } else {
+        msgBox.style.color = "var(--primary)";
+        msgBox.innerText = isHindi ? query + " खोज रहे हैं..." : "Searching for available " + query + "s..."; 
+        document.getElementById('find-workers').scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+  
+  function book(name) { 
+    const isHindi = document.getElementById('navLanguageSelect').value === 'hi';
+    if(isHindi) {
+      alert(name + " के लिए बुकिंग अनुरोध शुरू हो गया है।");
+    } else {
+      alert("Booking request initialized for " + name + ".");
+    }
+  }
+  
+  function submitMessage(msg) {
+    alert(msg + " successfully! We will contact you soon.");
+    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+  }
+
+  window.onclick = function(event) {
+    const workerModal = document.getElementById('workerModal');
+    const loginModal = document.getElementById('loginModal');
+    if (event.target === workerModal) { closeModal('workerModal'); }
+    if (event.target === loginModal) { closeModal('loginModal'); }
+  }
+</script>
+</body>
+</html>
